@@ -1,0 +1,1647 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>PDL Mobile API Reference</title>
+
+    <link href="stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="javascripts/all.js" type="text/javascript"></script>
+
+      <script>
+        $(function() {
+          setupLanguages(["shell"]);
+        });
+      </script>
+  </head>
+
+  <body class="index">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+      <img src="images/logo.png" />
+        <div class="lang-selector">
+              <a href="#" data-language-name="shell">shell</a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc">
+      </div>
+        <ul class="toc-footer">
+            <li><a href='http://github.com/tripit/slate'>Powered by Slate</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="introduction">Introduction</h1>
+
+<p>Welcome to API documentation for PDL Mobile.</p>
+
+<h1 id="global-headers">Global Headers</h1>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code><span class="c"># With shell, you can just pass the correct header with each request</span>
+curl <span class="s1">'api_endpoint'</span> -H <span class="s1">'OS: IOS'</span> -H <span class="s1">'Accept-Language: vi'</span>
+
+<span class="c"># For requests with required authentication and wrong token 401 will be returned</span>
+curl -X GET -H <span class="s1">'Auth-Token: aa380ba1669a57948dcfbd686ed2aa2'</span> <span class="s1">'https://api.mfi.vn/api/mobile/client'</span> -k -I
+HTTP/1.0 401 UNAUTHORIZED
+Content-Type: text/html
+Content-Length: 339
+Server: Werkzeug/0.10.4 Python/2.7.6
+Date: Wed, 04 Nov 2015 13:28:41 GMT
+</code></pre>
+
+<blockquote>
+<p>if request has errors in its sent data, special dictionary will be returned with keys corresponding to the data ones, e.g:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"errors"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"version is missing"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"os_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Header OS is missing"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<blockquote>
+<p>&lsquo;common&rsquo; key is used if error does not define any other particular key in request, like this:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"errors"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"common"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Pin is invalid"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<table><thead>
+<tr>
+<th>Header</th>
+<th>Required</th>
+<th>Values</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>OS</td>
+<td>required</td>
+<td>IOS, ANDROID, WINPHONE</td>
+<td>phone OS type</td>
+</tr>
+<tr>
+<td>Accept-Language</td>
+<td>required</td>
+<td>vi, en, ru</td>
+<td>locale</td>
+</tr>
+</tbody></table>
+
+<p>For POST requests one extra header should exist:</p>
+
+<table><thead>
+<tr>
+<th>Header</th>
+<th>Required</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>required</td>
+<td>application/json</td>
+</tr>
+</tbody></table>
+
+<p>For requests with required authentication another header should exist:</p>
+
+<table><thead>
+<tr>
+<th>Header</th>
+<th>Required</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Auth-Token</td>
+<td>required</td>
+<td>&#39;token&rsquo;</td>
+</tr>
+</tbody></table>
+
+<h3 id="errors-in-response">Errors in response</h3>
+
+<p>If for the endpoint required query arguments and/or headers are missing then error response will be returned.</p>
+
+<aside class="notice">
+Not all endpoints have data available in 'ru&rsquo; and 'en&rsquo; locales.
+</aside>
+
+<h1 id="mobile-version">Mobile Version</h1>
+
+<h2 id="get-current-version">Get Current Version</h2>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'OS: IOS'</span> <span class="s1">'https://api.mfi.vn/api/mobile/version?version=169'</span> -k
+</code></pre>
+
+<blockquote>
+<p>Return data structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"need_update"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">144</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.vn/api/mobile/version</code></p>
+
+<h3 id="query-parameters">Query Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>version</td>
+<td>required</td>
+<td>version of the mobile application</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>need_update</td>
+<td>boolean</td>
+<td>defines whether mobile version needs update or not</td>
+</tr>
+<tr>
+<td>version</td>
+<td>integer</td>
+<td>current version of the mobile application</td>
+</tr>
+</tbody></table>
+
+<h3 id="test-data">Test data</h3>
+
+<table><thead>
+<tr>
+<th>OS type</th>
+<th>version</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>IOS</td>
+<td>144</td>
+</tr>
+<tr>
+<td>IOS</td>
+<td>169</td>
+</tr>
+<tr>
+<td>ANDROID</td>
+<td>9801</td>
+</tr>
+<tr>
+<td>ANDROID</td>
+<td>10000</td>
+</tr>
+<tr>
+<td>WINPHONE</td>
+<td>188356</td>
+</tr>
+<tr>
+<td>WINPHONE</td>
+<td>189225</td>
+</tr>
+</tbody></table>
+
+<h1 id="calculator">Calculator</h1>
+
+<h2 id="get-calculator-data">Get calculator data</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'Accept-Language: vi'</span> <span class="s1">'https://api.mfi.vn/api/mobile/calculator'</span> -k
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"currency"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VND"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"mappings"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"terms"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_available"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"fx_service_fee"</span><span class="p">:</span><span class="w"> </span><span class="mi">17500000</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"repay_until"</span><span class="p">:</span><span class="w"> </span><span class="mi">1447102800</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_available"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"fx_service_fee"</span><span class="p">:</span><span class="w"> </span><span class="mi">37500000</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"repay_until"</span><span class="p">:</span><span class="w"> </span><span class="mi">1447794000</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="mi">21</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_available"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"fx_service_fee"</span><span class="p">:</span><span class="w"> </span><span class="mi">52500000</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"repay_until"</span><span class="p">:</span><span class="w"> </span><span class="mi">1448312400</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"term"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_available"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"fx_service_fee"</span><span class="p">:</span><span class="w"> </span><span class="mi">75000000</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"repay_until"</span><span class="p">:</span><span class="w"> </span><span class="mi">1449090000</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nt">"fx_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">250000000</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>This endpoint retrives data for credit calculator.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.com/api/mobile/calculator</code></p>
+
+<h3 id="query-parameters">Query Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>client_id</td>
+<td>not required</td>
+<td>integer</td>
+<td>If set, the result will contain calculator data for client with particular id otherwise return calculator data for non authorized users.</td>
+</tr>
+<tr>
+<td>lastupdatetime</td>
+<td>true</td>
+<td>integer, unixtime</td>
+<td>If set to particular timestamp and no newer data on the server were found then response will be empty ({}) otherwise returs calculator data.</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Main response object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>currency</td>
+<td>required</td>
+<td>string</td>
+<td>currency value</td>
+</tr>
+<tr>
+<td>mappings</td>
+<td>required</td>
+<td>array</td>
+<td>array of amount data</td>
+</tr>
+</tbody></table>
+
+<p>Amount data object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>fx_amount</td>
+<td>required</td>
+<td>integer</td>
+<td>amount of credit money</td>
+</tr>
+<tr>
+<td>terms</td>
+<td>required</td>
+<td>array</td>
+<td>array of term data</td>
+</tr>
+</tbody></table>
+
+<p>Term data object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>term</td>
+<td>required</td>
+<td>integer</td>
+<td>number of days for credit</td>
+</tr>
+<tr>
+<td>is_available</td>
+<td>required</td>
+<td>boolean</td>
+<td>defines if current amount + term available to choose in calculator</td>
+</tr>
+<tr>
+<td>fx_service_fee</td>
+<td>required</td>
+<td>integer</td>
+<td>service fee</td>
+</tr>
+<tr>
+<td>fx_service_fee_special</td>
+<td>not required</td>
+<td>integer</td>
+<td>promotional service fee</td>
+</tr>
+<tr>
+<td>repay_until</td>
+<td>required</td>
+<td>integer, unixtime</td>
+<td>repay deadline date</td>
+</tr>
+</tbody></table>
+
+<h1 id="faq">Faq</h1>
+
+<h2 id="get-faq-data">Get faq data</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'Accept-Language: vi'</span> <span class="s1">'https://api.mfi.vn/api/mobile/faq'</span> -k
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Sản phẩm/ Dịch vụ"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"header"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Lãi suất, phí là bao nhiêu?"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"list"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="s2">"Hotline: 1900 63 60 72"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"E-mail: hotro@micro-money.vn"</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tại thời điểm hiện tại, vui lòng tham khảo bảng tính lãi và phí dịch vụ sau. Mức lãi suất và phí dịch vụ sẽ được Chúng tôi công bố theo từng thời kỳ và sẽ được ghi rõ trong Hợp đồng. Để biết thêm thông tin, vui lòng liên hệ Bộ phận Dịch Vụ Khách Hàng của chúng tôi để được giải đáp: "</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre>
+
+<p>This endpoint retrives data for FAQ.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.com/api/mobile/faq</code></p>
+
+<h3 id="query-parameters">Query Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>lastupdatetime</td>
+<td>true</td>
+<td>integer, unixtime</td>
+<td>If set to particular timestamp and no newer data on the server were found then response will be empty ({}) otherwise returs current data.</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Returns array of category object.</p>
+
+<p>Category object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>category</td>
+<td>required</td>
+<td>string</td>
+<td>name of category</td>
+</tr>
+<tr>
+<td>questions</td>
+<td>required</td>
+<td>array</td>
+<td>array of questions</td>
+</tr>
+</tbody></table>
+
+<p>Question object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>header</td>
+<td>required</td>
+<td>string</td>
+<td>question</td>
+</tr>
+<tr>
+<td>text</td>
+<td>required</td>
+<td>string</td>
+<td>anwser</td>
+</tr>
+<tr>
+<td>list</td>
+<td>required</td>
+<td>array of strings</td>
+<td>additional list for answer</td>
+</tr>
+</tbody></table>
+
+<h3 id="test-data">Test data</h3>
+
+<p>There are test data for en, ru and vi languages.</p>
+
+<h1 id="questionnaire-form">Questionnaire Form</h1>
+
+<h2 id="get-questionnaire-form">Get Questionnaire Form</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'Accept-Language: vi'</span> <span class="s1">'https://api.mfi.vn/api/mobile/forms/questionnaire?lastupdatetime=14464614'</span> -k
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"guid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"V4EBHAF4K66OKIC"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"steps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Personal Information"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"fields"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"placeholder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Choose"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Field is required"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"field_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"status"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Job"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"select"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="p">{</span><span class="w">
+              </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Worker"</span><span class="p">,</span><span class="w">
+              </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10"</span><span class="p">,</span><span class="w">
+              </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="p">{</span><span class="w">
+              </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Office worker"</span><span class="p">,</span><span class="w">
+              </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8"</span><span class="p">,</span><span class="w">
+              </span><span class="nt">"order"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+          </span><span class="p">]</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"placeholder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Nguyễn Thu Giang"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Field is required"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"field_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"full_name"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Full name"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"regexp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/^([a-z0-9A-Z]{2,}[\s]*$/"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"text"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"placeholder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0123 456 78 90"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Field is required"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"field_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mobile"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Mobile phone"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"regexp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/^[\d]{4}[\s][\d]{3}[\s][\d]{2}[\s][\d]{1,2}$/"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"phone"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"placeholder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20.01.1990"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Field is required"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"field_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"birth"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Birthday"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"regexp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/^[\d]{2}[.][\d]{2}[.][\d]{4}$/"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nt">"placeholder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"thugiang@mail.com"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"error_message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Field is required"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"field_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"E-mail"</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"is_required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="err">...</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Retrives data for credit application.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.com/api/mobile/forms/questionnaire</code></p>
+
+<h3 id="query-parameters">Query Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>lastupdatetime</td>
+<td>true</td>
+<td>integer, unixtime</td>
+<td>If set to particular timestamp and no newer data on the server were found then response will be empty ({}) otherwise returs applicaiton data.</td>
+</tr>
+<tr>
+<td>client_id (not implemented yet)</td>
+<td>not required</td>
+<td>integer</td>
+<td>If set, the result will contain data for client with particular id otherwise return data for non authorized users.</td>
+</tr>
+</tbody></table>
+
+<aside class="warning">
+Please notice that support for client_id hasn&rsquo;t implemented yet!
+</aside>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Main response object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>guid</td>
+<td>required</td>
+<td>string</td>
+<td>identifier string for current application</td>
+</tr>
+<tr>
+<td>steps</td>
+<td>required</td>
+<td>array</td>
+<td>array of steps data</td>
+</tr>
+</tbody></table>
+
+<p>Step object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>step</td>
+<td>required</td>
+<td>integer</td>
+<td>number of the current application step</td>
+</tr>
+<tr>
+<td>name</td>
+<td>required</td>
+<td>string</td>
+<td>name of the current application step</td>
+</tr>
+<tr>
+<td>fields</td>
+<td>required</td>
+<td>array</td>
+<td>array of field data</td>
+</tr>
+</tbody></table>
+
+<p>Field data object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>field_id</td>
+<td>required</td>
+<td>string</td>
+<td>unique name for the field</td>
+</tr>
+<tr>
+<td>type</td>
+<td>required</td>
+<td>string</td>
+<td>field type (see <a href="/#questionnaire-types-list">Types section</a> for available types)</td>
+</tr>
+<tr>
+<td>value</td>
+<td>not required</td>
+<td>string</td>
+<td>field value</td>
+</tr>
+<tr>
+<td>label</td>
+<td>not required</td>
+<td>string</td>
+<td>field label</td>
+</tr>
+<tr>
+<td>placeholder</td>
+<td>not required</td>
+<td>string</td>
+<td>field placeholder</td>
+</tr>
+<tr>
+<td>error_message</td>
+<td>not required</td>
+<td>string</td>
+<td>error message when value is invalid for the field</td>
+</tr>
+<tr>
+<td>hint</td>
+<td>not required</td>
+<td>string</td>
+<td>hint for the field</td>
+</tr>
+<tr>
+<td>is_required</td>
+<td>required</td>
+<td>boolean</td>
+<td>field required flag</td>
+</tr>
+<tr>
+<td>max_limit</td>
+<td>not required</td>
+<td>integer</td>
+<td>max symbols count in value</td>
+</tr>
+<tr>
+<td>min_limit</td>
+<td>not required</td>
+<td>integer</td>
+<td>min symbols count in value</td>
+</tr>
+<tr>
+<td>options</td>
+<td>not required (required only if field type is &#39;select&rsquo; or &#39;radio&rsquo;)</td>
+<td>array</td>
+<td>available values for the current field ()</td>
+</tr>
+</tbody></table>
+
+<p>If field type is &#39;select&rsquo; or &#39;radio&rsquo;, additional key &#39;options&rsquo; will be available in field data.</p>
+
+<p>Option data object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>field_id</td>
+<td>required</td>
+<td>string</td>
+<td>unique name of the option</td>
+</tr>
+<tr>
+<td>value</td>
+<td>required</td>
+<td>string</td>
+<td>value of the option</td>
+</tr>
+</tbody></table>
+
+<h3 id="questionnaire-types-list">Questionnaire Types List</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>text</td>
+<td>text input</td>
+</tr>
+<tr>
+<td>text_multi</td>
+<td>multiline text</td>
+</tr>
+<tr>
+<td>text_static</td>
+<td>static text</td>
+</tr>
+<tr>
+<td>numeric</td>
+<td>integer number</td>
+</tr>
+<tr>
+<td>checkbox</td>
+<td>checkbox</td>
+</tr>
+<tr>
+<td>select</td>
+<td>select input</td>
+</tr>
+<tr>
+<td>radio</td>
+<td>radio box</td>
+</tr>
+<tr>
+<td>password</td>
+<td>password input</td>
+</tr>
+<tr>
+<td>date</td>
+<td>date input</td>
+</tr>
+<tr>
+<td>photo_front</td>
+<td>image file</td>
+</tr>
+<tr>
+<td>photo_back</td>
+<td>image file</td>
+</tr>
+<tr>
+<td>email</td>
+<td>email input</td>
+</tr>
+<tr>
+<td>phone_primary</td>
+<td>phone input</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>phone input</td>
+</tr>
+</tbody></table>
+
+<h2 id="send-verification-code">Send Verification Code</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X POST -H <span class="s1">'Accept-Language: vi'</span> -H <span class="s1">'Content-Type: application/json'</span> <span class="s1">'https://api.mfi.vn/api/mobile/forms/questionnaire/send-code'</span> -k -d <span class="s1">'{"guid": "V4EBHAF4K66OKIC", "phone": "84555111134"}'</span>
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Sends verification code on client&rsquo;s phone. </p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST https://api.mfi.com/api/mobile/forms/questionnaire/send-code</code></p>
+
+<h3 id="json-parameters">JSON Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>guid</td>
+<td>required</td>
+<td>string</td>
+<td>application identifier</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>required</td>
+<td>string</td>
+<td>client&rsquo;s phone number</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Main response object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>success</td>
+<td>required</td>
+<td>boolean</td>
+<td>defines whether code sent or not</td>
+</tr>
+</tbody></table>
+
+<h2 id="check-verification-code">Check Verification Code</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X POST -H <span class="s1">'Accept-Language: vi'</span> -H <span class="s1">'Content-Type: application/json'</span> <span class="s1">'https://api.mfi.vn/api/mobile/forms/questionnaire/check-code'</span> -k -d <span class="s1">'{"guid": "V4EBHAF4K66OKIC", "code": 1234}'</span>
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Checks verification code for particular application. There are 5 attempts to match code correctly, otherwise resend code request is needed.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST https://api.mfi.com/api/mobile/forms/questionnaire/check-code</code></p>
+
+<h3 id="json-parameters">JSON Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>guid</td>
+<td>required</td>
+<td>string</td>
+<td>application identifier</td>
+</tr>
+<tr>
+<td>code</td>
+<td>required</td>
+<td>integer</td>
+<td>code clients received on his phone</td>
+</tr>
+</tbody></table>
+
+<aside class="success">
+There is a special code 111111 that works on test server and will pass sms verification.
+</aside>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Main response object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>success</td>
+<td>required</td>
+<td>boolean</td>
+<td>defines whether code is correct or not</td>
+</tr>
+</tbody></table>
+
+<h3 id="common-errors">Common errors:</h3>
+
+<table><thead>
+<tr>
+<th>Error</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Code is invalid</td>
+<td>Code doesn&rsquo;t match with the one that was set before with <a href="/#send-verification-code">this endpoint</a>.</td>
+</tr>
+</tbody></table>
+
+<h2 id="post-questionnaire-form">Post Questionnaire Form</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X POST -H <span class="s1">'Accept-Language: vi'</span> <span class="s1">'https://api.mfi.vn/api/mobile/forms/questionnaire'</span> -k 
+-d <span class="s1">'{"guid": "V4EBHAF4K66OKIC", "step": 1, "calc_sum": 100000000, "calc_days": 7,  "status": 10, "full_name": "John Doe", ...}'</span>
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Sends data for new credit application. Information sends as JSON data with keys as corresponding field_id,
+which can be accessed in <a href="/#get-questionnaire-form">get questionnaire endpoint</a>.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST https://api.mfi.com/api/mobile/forms/questionnaire</code></p>
+
+<h3 id="json-parameters">JSON Parameters</h3>
+
+<p>Main JSON data corresponds with data which client got using <a href="/#get-questionnaire-form">get questionnaire endpoint</a> for current step.
+Also additional keys parameters needed:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>guid</td>
+<td>required</td>
+<td>string</td>
+<td>application identifier</td>
+</tr>
+<tr>
+<td>step</td>
+<td>required</td>
+<td>integer</td>
+<td>step of the data</td>
+</tr>
+<tr>
+<td>client_id (not implemented yet)</td>
+<td>not required</td>
+<td>integer</td>
+<td>If set, the result will contain data for client with particular id otherwise return data for non authorized users.</td>
+</tr>
+<tr>
+<td>calc_sum</td>
+<td>required</td>
+<td>integer</td>
+<td>credit days</td>
+</tr>
+<tr>
+<td>calc_days</td>
+<td>required</td>
+<td>integer</td>
+<td>credit sum</td>
+</tr>
+<tr>
+<td>fb_user_id</td>
+<td>not required</td>
+<td>string</td>
+<td>user facebook id</td>
+</tr>
+<tr>
+<td>fb_token</td>
+<td>not required</td>
+<td>string</td>
+<td>user token</td>
+</tr>
+</tbody></table>
+
+<aside class="warning">
+Please notice that support for client_id hasn&rsquo;t implemented yet!
+</aside>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Main response object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>success</td>
+<td>required</td>
+<td>boolean</td>
+<td>defines whether application accepted by server or not</td>
+</tr>
+</tbody></table>
+
+<h2 id="upload-questionnaire-photo">Upload Questionnaire Photo</h2>
+
+<blockquote>
+<p>Example:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -F <span class="s2">"guid=V4E9876SD987G"</span> -F <span class="s2">"photo_front=@/path/to/file"</span> <span class="s1">'https://api.mfi.vn/api/mobile/forms/questionnaire/upload-photo'</span>
+</code></pre>
+
+<blockquote>
+<p>Response JSON Structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Uploads photo for current application. Make sure you use enctype with &#39;multipart/form-data&rsquo; value.
+File size is limited to 1 MB.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST https://api.mfi.com/api/mobile/forms/questionnaire/upload-photo</code></p>
+
+<h3 id="parameters">Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>guid</td>
+<td>required</td>
+<td>string</td>
+<td>application identifier</td>
+</tr>
+<tr>
+<td>photo_front or photo_back</td>
+<td>required</td>
+<td>string</td>
+<td>file</td>
+</tr>
+</tbody></table>
+
+<aside class="notice">
+Send photo_front or photo_back file per request.
+</aside>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<p>Main response object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>success</td>
+<td>required</td>
+<td>boolean</td>
+<td>result</td>
+</tr>
+</tbody></table>
+
+<h1 id="clients">Clients</h1>
+
+<h2 id="check-client">Check client</h2>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET <span class="s1">'https://api.mfi.vn/api/mobile/client/check?client_id=01221111111'</span>
+
+</code></pre>
+
+<blockquote>
+<p>Return data structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"exist"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.vn/api/mobile/client/check</code></p>
+
+<h3 id="query-parameters">Query Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>client_id</td>
+<td>required</td>
+<td>string</td>
+<td>client id</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>exist</td>
+<td>required</td>
+<td>boolean</td>
+<td>defines whether client with id exists or not</td>
+</tr>
+</tbody></table>
+
+<h3 id="test-data">Test data</h3>
+
+<table><thead>
+<tr>
+<th>Client</th>
+<th>Id</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>client 1</td>
+<td>01221111111</td>
+</tr>
+<tr>
+<td>client 2</td>
+<td>01221111222</td>
+</tr>
+<tr>
+<td>client 3</td>
+<td>01221111333</td>
+</tr>
+<tr>
+<td>client 4</td>
+<td>01221111444</td>
+</tr>
+<tr>
+<td>client 5</td>
+<td>01221111555</td>
+</tr>
+<tr>
+<td>client 6</td>
+<td>01221111666</td>
+</tr>
+</tbody></table>
+
+<h2 id="set-pin-code-for-client">Set pin code for client</h2>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X POST -H <span class="s1">'Content-Type: application/json'</span> <span class="s1">'https://api.mfi.vn/api/mobile/client/pin'</span> -k
+  -d <span class="s1">'{"client_id": "01221111666", "pin": "111111"}'</span>
+</code></pre>
+
+<blockquote>
+<p>Return data structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"success"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST https://api.mfi.vn/api/mobile/client/pin</code></p>
+
+<h3 id="json-parameters">JSON Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>client_id</td>
+<td>required</td>
+<td>string</td>
+<td>id of the client for which new pin will be set</td>
+</tr>
+<tr>
+<td>pin</td>
+<td>required</td>
+<td>string</td>
+<td>new pin code</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>success</td>
+<td>boolean</td>
+<td>if pin set successfully or not</td>
+</tr>
+</tbody></table>
+
+<h2 id="authorize-client">Authorize client</h2>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X POST -H <span class="s1">'Content-Type: application/json'</span> <span class="s1">'https://api.mfi.vn/api/mobile/client/auth'</span> -k
+  -d <span class="s1">'{"client_id": "01221111111", "pin": "111111"}'</span>
+</code></pre>
+
+<blockquote>
+<p>Return data structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aa380ba1669a57948dcfbd686ed2aa2f"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">POST https://api.mfi.vn/api/mobile/client/auth</code></p>
+
+<h3 id="json-parameters">JSON Parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Required</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>client_id</td>
+<td>required</td>
+<td>string</td>
+<td>client id</td>
+</tr>
+<tr>
+<td>pin</td>
+<td>required</td>
+<td>integer</td>
+<td>current pin code</td>
+</tr>
+</tbody></table>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>token</td>
+<td>string</td>
+<td>token that will authenticate client for corresponding endpoint</td>
+</tr>
+</tbody></table>
+
+<h3 id="common-errors">Common errors:</h3>
+
+<table><thead>
+<tr>
+<th>Error</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Pin is invalid</td>
+<td>User with client id exists but pin doesn&rsquo;t match</td>
+</tr>
+<tr>
+<td>User is blocked</td>
+<td>User is not active</td>
+</tr>
+<tr>
+<td>User not found</td>
+<td>User with client id does not exist</td>
+</tr>
+</tbody></table>
+
+<h3 id="test-data">Test data</h3>
+
+<table><thead>
+<tr>
+<th>Client ID</th>
+<th>Pin</th>
+<th>Active (not blocked)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>0122 1111 111</td>
+<td>1000</td>
+<td>true</td>
+</tr>
+<tr>
+<td>0122 1111 222</td>
+<td>2000</td>
+<td>true</td>
+</tr>
+<tr>
+<td>0122 1111 333</td>
+<td>3000</td>
+<td>false</td>
+</tr>
+</tbody></table>
+
+<h2 id="get-current-client-info">Get current client info</h2>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'Auth-Token: aa380ba1669a57948dcfbd686ed2aa2f'</span> <span class="s1">'https://api.mfi.vn/api/mobile/client'</span> -k
+</code></pre>
+
+<blockquote>
+<p>Return data structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"active"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Shchi"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Sk\u00ed"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"middle_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"G\u00eal"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"01221111111"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Requires authentication token header.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.vn/api/mobile/client</code></p>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>active</td>
+<td>boolean</td>
+<td>if client is active or not</td>
+</tr>
+<tr>
+<td>first_name</td>
+<td>string</td>
+<td>first name</td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>string</td>
+<td>last name</td>
+</tr>
+<tr>
+<td>middle_name</td>
+<td>string</td>
+<td>middle name</td>
+</tr>
+</tbody></table>
+
+<h1 id="credits">Credits</h1>
+
+<h2 id="get-credits-info">Get credits info</h2>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'Auth-Token: aa380ba1669a57948dcfbd686ed2aa2f'</span> <span class="s1">'https://api.mfi.vn/api/mobile/credits'</span> -k
+</code></pre>
+
+<blockquote>
+<p>Return data structure:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"issued"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"credit_sum"</span><span class="p">:</span><span class="w"> </span><span class="mi">2000000</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"appointment"</span><span class="p">:</span><span class="w"> </span><span class="s2">"new phone"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"nearest_payment_value"</span><span class="p">:</span><span class="w"> </span><span class="mi">2280000</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"contract"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MM1234567"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"return_sum"</span><span class="p">:</span><span class="w"> </span><span class="mi">2280000</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"nearest_payment_date"</span><span class="p">:</span><span class="w"> </span><span class="mi">1448014709</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"credit_date"</span><span class="p">:</span><span class="w"> </span><span class="mi">1446805109</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"first loan free"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"is_expired"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"debt_amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">280000</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre>
+
+<p>Requires authentication token header. Returns list of credits for current authenticated client.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.vn/api/mobile/credits</code></p>
+
+<h3 id="return-parameters">Return parameters</h3>
+
+<aside class="warning">
+Will be updated later when actual credit structure will come. Now returns some temp data.
+</aside>
+
+<h2 id="get-credit-info">Get credit info</h2>
+
+<p>Requires authentication token header. Returns credit info with particular id for current authenticated client.</p>
+
+<h3 id="http-request">HTTP Request</h3>
+
+<p><code class="prettyprint">GET https://api.mfi.vn/api/mobile/credits/&lt;credit_id&gt;</code></p>
+
+<blockquote>
+<p>Examples:</p>
+</blockquote>
+<pre class="highlight shell"><code>curl -X GET -H <span class="s1">'Auth-Token: aa380ba1669a57948dcfbd686ed2aa2f'</span> <span class="s1">'https://api.mfi.vn/api/mobile/credits/1'</span> -k
+</code></pre>
+
+          <h1 id="errors">Errors</h1>
+
+<aside class="notice">This error section is stored in a separate file in `includes/_errors.md`. Slate allows you to optionally separate out your docs into many files&hellip;just save them to the `includes` folder and add them to the top of your `index.md`&rsquo;s frontmatter. Files are included in the order listed.</aside>
+
+<p>The Kittn API uses the following error codes:</p>
+
+<table><thead>
+<tr>
+<th>Error Code</th>
+<th>Meaning</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>400</td>
+<td>Bad Request &ndash; Your request sucks</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Unauthorized &ndash; Your API key is wrong</td>
+</tr>
+<tr>
+<td>403</td>
+<td>Forbidden &ndash; The kitten requested is hidden for administrators only</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not Found &ndash; The specified kitten could not be found</td>
+</tr>
+<tr>
+<td>405</td>
+<td>Method Not Allowed &ndash; You tried to access a kitten with an invalid method</td>
+</tr>
+<tr>
+<td>406</td>
+<td>Not Acceptable &ndash; You requested a format that isn&rsquo;t json</td>
+</tr>
+<tr>
+<td>410</td>
+<td>Gone &ndash; The kitten requested has been removed from our servers</td>
+</tr>
+<tr>
+<td>418</td>
+<td>I&rsquo;m a teapot</td>
+</tr>
+<tr>
+<td>429</td>
+<td>Too Many Requests &ndash; You&rsquo;re requesting too many kittens! Slow down!</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
+</tr>
+<tr>
+<td>503</td>
+<td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again later.</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name="shell">shell</a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
